@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/back_tela_inicial"
+    tools:context=".activities.TelaInicial">
+
+    <ImageButton
+        android:id="@+id/btn_profile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/user2"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <TextView
+        android:id="@+id/txt_bemVindo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="33dp"
+        android:textSize="18sp"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/bemVindo" />
+
+    <Button
+        android:id="@+id/btn_gerenciarC"
+        android:layout_width="128dp"
+        android:layout_height="73dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="200dp"
+        android:backgroundTint="#92DBDC"
+        android:elevation="10dp"
+        android:shadowColor="#0B0B0B"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="0"
+        android:text="@string/gerenciarC"
+        android:textSize="16sp"
+        app:cornerRadius="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_gerenciarE"
+        android:layout_width="128dp"
+        android:layout_height="73dp"
+        android:layout_marginTop="200dp"
+        android:layout_marginEnd="48dp"
+        android:backgroundTint="#92DBDC"
+        android:elevation="10dp"
+        android:shadowColor="#0B0B0B"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="0"
+        android:text="@string/gerenciarE"
+        android:textSize="16sp"
+        app:cornerRadius="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_sair"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="172dp"
+        android:layout_marginTop="95dp"
+        android:layout_marginEnd="172dp"
+        android:backgroundTint="#C57575"
+        android:text="Sair"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.523"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_gerenciarC" />
+
+    <Button
+        android:id="@+id/btn_visualizarU"
+        android:layout_width="193dp"
+        android:layout_height="65dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="9dp"
+        android:layout_marginEnd="202dp"
+        android:backgroundTint="@color/beige"
+        android:elevation="10dp"
+        android:shadowColor="#0B0B0B"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="0"
+        android:text="@string/visualizarU"
+        android:textColor="@color/black"
+        android:textSize="18dp"
+        app:cornerRadius="10dp"
+        app:icon="@drawable/baseline_person_pin_24"
+        app:iconGravity="textStart"
+        app:iconSize="30dp"
+        app:iconTint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_bemVindo" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

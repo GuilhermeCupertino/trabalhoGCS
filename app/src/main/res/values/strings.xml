@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">p2</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="cadastro">Cadastrar</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="semConta">"Ainda não tem uma conta?"</string>
+    <string name="voltar">Voltar</string>
+    <string name="buscar">Buscar</string>
+    <string name="nova_cidade">Nova Cidade</string>
+    <string name="novo_endere_o">Novo Endereço</string>
+    <string name="salvar">Salvar</string>
+    <string name="longitude">Longitude</string>
+    <string name="latitude">Latitude</string>
+    <string name="descri_o">Descrição</string>
+    <string name="estado">Estado</string>
+    <string name="cidade">Cidade</string>
+    <string name="novaCidadeView">Nova Cidade</string>
+    <string name="editar_endere_o">Editar endereço</string>
+    <string name="excluir">Excluir</string>
+    <string name="criarConta">"Criar Conta"</string>
+    <string name="username">"Name"</string>
+    <string name="phone">"Telephone"</string>
+    <string name="cadastrar">"Cadastrar"</string>
+    <string name="bemVindo">"Bem vindo(a), "</string>
+    <string name="gerenciarC">"Gerenciar cidades"</string>
+    <string name="gerenciarE">"Gerenciar endereços"</string>
+    <string name="visualizarU">"Visualizar usuários"</string>
+    <string name="editarConta">"Editar conta"</string>
+    <string name="novoE">"Novo endereço"</string>
+    <string name="novaC">"Nova cidade"</string>
+    <string name="selecioneE">"Selecione o endereço que deseja visualizar no mapa:"</string>
+    <string name="alterar">"Alterar"</string>
+    <string name="descricaoE">"Descrição"</string>
+    <string name="hide_txt">""</string>
+    <string name="nomeApp">"AddressTracker"</string>
+    <string name="listaU">"Usuários cadastrados"</string>
+
+
+</resources>
