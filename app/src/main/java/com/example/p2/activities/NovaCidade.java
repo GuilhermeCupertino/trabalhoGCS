@@ -54,14 +54,18 @@ public class NovaCidade extends AppCompatActivity {
     private void salvarCidade() {
         String nome = nomeEditText.getText().toString();
         String estado = estadoEditText.getText().toString();
+        if(nome != null && estado != null){
+            Cidade novaCidade = new Cidade();
+            novaCidade.setNomeCidade(nome);
+            novaCidade.setEstado(estado);
 
-        Cidade novaCidade = new Cidade();
-        novaCidade.setNomeCidade(nome);
-        novaCidade.setEstado(estado);
-
-        db.cidadeDao().insert(novaCidade);
-        Toast.makeText(this, "Cidade salva com sucesso!", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(NovaCidade.this, GerenciarCidades.class);
-        startActivity(intent);
+            db.cidadeDao().insert(novaCidade);
+            Toast.makeText(this, "Cidade salva com sucesso!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(NovaCidade.this, GerenciarCidades.class);
+            startActivity(intent);
+        }
+        else{
+            logger.error("Dados faltantes");
+        }
     }
 }
