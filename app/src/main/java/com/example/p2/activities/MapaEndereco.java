@@ -33,7 +33,6 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
     private int enderecoId;
     private SharedPreferences sharedPreferences;
     private Button voltar;
-    private Button edtEnd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,14 +63,7 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
                 startActivity(intent);
             }
         });
-        edtEnd = findViewById(R.id.edtEndMapa);
-        edtEnd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MapaEndereco.this, EdtEndereco.class);
-                startActivity(intent);
-            }
-        });
+
     }
 
     @Override
@@ -96,23 +88,16 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
 
         EnderecoDao enderecoDao = AppDatabase.getDatabase(this).enderecoDao();
         Endereco endereco = enderecoDao.getEndereco(enderecoId);
+        novoEndereco = enderecoDao;
+
+        if(endereco != endMarcado){
+            endMarcado = endereco;
+            print("endMarcado");
+        }
 
         // Debug print
         Log.d(TAG, "Endereco: " + endereco);
 
-        if (endereco != null) {
-            longi = endereco.getLongitude();
-            lati = endereco.getLatitude();
-            endMarcado = endereco.getDescricao();
-
-            // Debug prints for latitude and longitude
-            Log.d(TAG, "Longitude: " + longi);
-            Log.d(TAG, "Latitude: " + lati);
-
-            return new LatLng(lati, longi);
-        } else {
-            Toast.makeText(this, "Erro: endereço não encontrado", Toast.LENGTH_SHORT).show();
-            return null;
-        }
+       
     }
 }
