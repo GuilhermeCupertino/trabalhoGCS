@@ -26,7 +26,7 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
 
     private static final String TAG = "MapaEndereco";
 
-    private GoogleMap map;
+    private GoogleMap mapi;
     private ActivityMapaEnderecoBinding binding;
     private double lati, longi;
     private String endMarcado;
@@ -101,6 +101,7 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
         Log.d(TAG, "Endereco: " + endereco);
 
         if (endereco != null) {
+            print("Mapa não encontrado");
             longi = endereco.getLongitude();
             lati = endereco.getLatitude();
             endMarcado = endereco.getDescricao();
