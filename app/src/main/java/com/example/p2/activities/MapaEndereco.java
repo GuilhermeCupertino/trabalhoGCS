@@ -15,7 +15,6 @@ import com.example.p2.dao.EnderecoDao;
 import com.example.p2.database.AppDatabase;
 import com.example.p2.databinding.ActivityMapaEnderecoBinding;
 import com.example.p2.entities.Endereco;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -32,8 +31,6 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
     private String endMarcado;
     private int enderecoId;
     private SharedPreferences sharedPreferences;
-    private Button voltar;
-    private Button edtEnd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,32 +43,21 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
         if (latLng != null) {
             lati = latLng.latitude;
             longi = latLng.longitude;
+            if(lati>50){
+                mark = false;
+            }else{mark = true;
+            }
         }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        if (mapFragment != null) {
+        if (mapFragment != null && mark == true) {
             mapFragment.getMapAsync(this);
         } else {
             Toast.makeText(this, "Erro ao carregar o mapa", Toast.LENGTH_SHORT).show();
         }
-        voltar = findViewById(R.id.btn_voltarEndereco);
-        voltar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MapaEndereco.this, GerenciarEndereco.class);
-                startActivity(intent);
-            }
-        });
-        edtEnd = findViewById(R.id.edtEndMapa);
-        edtEnd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MapaEndereco.this, EdtEndereco.class);
-                startActivity(intent);
-            }
-        });
+
     }
 
     @Override
@@ -96,6 +82,13 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
 
         EnderecoDao enderecoDao = AppDatabase.getDatabase(this).enderecoDao();
         Endereco endereco = enderecoDao.getEndereco(enderecoId);
+        novoEndereco = enderecoDao;
+
+        if(endereco != endMarcado){
+            print();
+            endMarcado = endereco;
+            print("endMarcado");
+        }
 
         // Debug print
         Log.d(TAG, "Endereco: " + endereco);
