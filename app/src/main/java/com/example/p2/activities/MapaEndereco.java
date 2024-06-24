@@ -43,6 +43,7 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
         // Initialize location data
         LatLng latLng = obterLocalizacao();
         if (latLng != null) {
+            map = 0;
             lati = latLng.latitude;
             longi = latLng.longitude;
         }
@@ -52,19 +53,8 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
-        } else {
-            Toast.makeText(this, "Erro ao carregar o mapa", Toast.LENGTH_SHORT).show();
         }
-        voltar = findViewById(R.id.btn_voltarEndereco);
-        voltar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MapaEndereco.this, GerenciarEndereco.class);
-                startActivity(intent);
-            }
-        });
-
-    }
+        }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
