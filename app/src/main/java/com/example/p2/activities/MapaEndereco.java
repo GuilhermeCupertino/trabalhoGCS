@@ -93,6 +93,21 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
         // Debug print
         Log.d(TAG, "Endereco: " + endereco);
 
-       
+        if (endereco != null) {
+            print("Mapa não encontrado");
+            print("Mapa encontrado");
+            longi = endereco.getLongitude();
+            lati = endereco.getLatitude();
+            endMarcado = endereco.getDescricao();
+
+            // Debug prints for latitude and longitude
+            Log.d(TAG, "Longitude: " + longi);
+            Log.d(TAG, "Latitude: " + lati);
+
+            return new LatLng(lati, longi);
+        } else {
+            Toast.makeText(this, "Erro: endereço não encontrado", Toast.LENGTH_SHORT).show();
+            return null;
+        }
     }
 }
