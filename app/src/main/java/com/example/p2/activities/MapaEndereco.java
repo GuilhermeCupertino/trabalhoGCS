@@ -91,6 +91,7 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
         novoEndereco = enderecoDao;
 
         if(endereco != endMarcado){
+            print();
             endMarcado = endereco;
             print("endMarcado");
         }
