@@ -1,96 +1,52 @@
-package com.example.p2.activities;
-
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.room.Room;
-
-import com.example.p2.R;
-import com.example.p2.dao.UsuarioDao;
-import com.example.p2.database.AppDatabase;
-import com.example.p2.entities.Usuario;
-
 public class EditarConta extends AppCompatActivity {
 
-    private Button voltar;
-    private Button salvar;
-    private TextView nome;
-    private TextView telefone;
-    private TextView email;
-    private TextView senha;
+    private Button voltar, salvar, deletar;
+    private TextView nome, telefone, email, senha;
     private int usuarioId;
     private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_editar_conta);
 
         voltar = findViewById(R.id.btn_voltarTelaInicial);
         salvar = findViewById(R.id.btn_salvar);
+        deletar = findViewById(R.id.btn_deletar); // Referência ao botão de deletar
         nome = findViewById(R.id.txt_editName);
         telefone = findViewById(R.id.txt_editPhone);
         email = findViewById(R.id.txt_editEmail);
         senha = findViewById(R.id.txt_editPassword);
 
+        voltar.setOnClickListener(v -> startActivity(new Intent(EditarConta.this, TelaInicial.class)));
+        salvar.setOnClickListener(v -> salvarConta());
+        deletar.setOnClickListener(v -> confirmarDelecao()); // Adiciona um ouvinte de cliques ao botão de deletar
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        voltar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(EditarConta.this, TelaInicial.class));
-            }
-        });
-
-        salvar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                salvarConta();
-            }
-        });
-
-        // Preenche o TextView com os dados do usuário
         preencherDadosUsuario();
     }
 
-    private void preencherDadosUsuario() {
-        // Obtém o usuário do banco de dados pelo ID
-        sharedPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
-        usuarioId = sharedPreferences.getInt("usuarioId", -1);
+    private void confirmarDelecao() {
+        new AlertDialog.Builder(this)
+            .setTitle("Confirmar Deleção")
+            .setMessage("Você tem certeza que deseja deletar sua conta? Esta ação é irreversível.")
+            .setPositiveButton("Deletar", (dialog, which) -> deletarConta())
+            .setNegativeButton("Cancelar", null)
+            .show();
+    }
+
+    private void deletarConta() {
         UsuarioDao usuarioDao = AppDatabase.getDatabase(this).usuarioDao();
         Usuario usuario = usuarioDao.getUser(usuarioId);
-
-        // Verifica se o usuário foi encontrado
         if (usuario != null) {
-            // Preenche os TextViews com os dados do usuário
-            nome.setText(usuario.getNome());
-            telefone.setText(usuario.getTelefone());
-            email.setText(usuario.getEmail());
-            senha.setText(usuario.getSenha());
-        } else {
-            // Mostra uma mensagem de erro se o usuário não foi encontrado
-            Toast.makeText(this, "Erro: usuário não encontrado", Toast.LENGTH_SHORT).show();
+            usuarioDao.delete(usuario);
+            showToast("Conta deletada com sucesso.");
 
             // Volta para a tela de login
             Intent intent = new Intent(EditarConta.this, MainActivity.class);
             startActivity(intent);
             finish();
+        } else {
+            showToast("Erro: usuário não encontrado");
         }
     }
 
