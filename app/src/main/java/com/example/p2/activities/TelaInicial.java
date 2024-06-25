@@ -102,8 +102,9 @@ public class TelaInicial extends AppCompatActivity {
             Usuario usuario = usuarioDao.getUser(usuarioId);
 
             if (usuario != null) {
-                String nomeUsuario = usuario();
-                bemVindo.setText(getString(bemVindo) + " " + nomeUsuario);
+                String nomeUsuario = usuario.getNome();
+                bemVindo.setText(getString(R.string.bemVindo) + " " + nomeUsuario);
+
             }
         }
     }

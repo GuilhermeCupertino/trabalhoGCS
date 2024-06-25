@@ -59,7 +59,8 @@ public class VisualizarUsuarios extends AppCompatActivity {
         volta.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(VisualizarUsuarios.this, MainActivity.class));
+                startActivity(new Intent(VisualizarUsuarios.this, TelaInicial.class));
+
             }
         });
     }
