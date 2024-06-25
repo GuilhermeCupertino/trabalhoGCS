@@ -25,7 +25,7 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
 
     private static final String TAG = "MapaEndereco";
 
-    private GoogleMap map;
+    private GoogleMap mapeamento ;
     private ActivityMapaEnderecoBinding binding;
     private double lati, longi;
     private String endMarcado;
@@ -61,16 +61,58 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
+  public void onMapReady(GoogleMap googleMap) {
+        mapeamento = googleMap;
         sharedPreferences = getSharedPreferences("locPref", MODE_PRIVATE);
         endMarcado = sharedPreferences.getString("endMarcado", "endereço não encontrado.");
         LatLng latLng = new LatLng(lati, longi);
-        map.addMarker(new MarkerOptions().position(latLng).title(endMarcado));
-        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
+        mapeamento .addMarker(new MarkerOptions().position(latLng).title(endMarcado));
+        mapeamento .moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mapeamento .setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mapeamento .animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
+    }
+
+    private void setupMapTypeButtons() {
+        Button buttonNormal = findViewById(R.id.buttonNormal);
+        Button buttonSatellite = findViewById(R.id.buttonSatellite);
+        Button buttonTerrain = findViewById(R.id.buttonTerrain);
+        Button buttonHybrid = findViewById(R.id.buttonHybrid);
+
+        buttonNormal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (map != null) {
+                    map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                }
+            }
+        });
+
+        buttonSatellite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (map != null) {
+                    map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                }
+            }
+        });
+
+        buttonTerrain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (map != null) {
+                    map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                }
+            }
+        });
+
+        buttonHybrid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (map != null) {
+                    map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                }
+            }
+        });
     }
 
     private LatLng obterLocalizacao() {
@@ -82,20 +124,11 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
 
         EnderecoDao enderecoDao = AppDatabase.getDatabase(this).enderecoDao();
         Endereco endereco = enderecoDao.getEndereco(enderecoId);
-        novoEndereco = enderecoDao;
-
-        if(endereco != endMarcado){
-            print();
-            endMarcado = endereco;
-            print("endMarcado");
-        }
 
         // Debug print
         Log.d(TAG, "Endereco: " + endereco);
 
         if (endereco != null) {
-            print("Mapa não encontrado");
-            print("Mapa encontrado");
             longi = endereco.getLongitude();
             lati = endereco.getLatitude();
             endMarcado = endereco.getDescricao();
