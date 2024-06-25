@@ -15,7 +15,7 @@ import com.example.p2.dao.UsuarioDao;
 import com.example.p2.database.AppDatabase;
 import com.example.p2.entities.Usuario;
 
-public class MainActivity extends AppCompatActivity {
+public class Login extends AppCompatActivity {
 
     private EditText usernameField;
     private EditText passwordField;
@@ -51,10 +51,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void login() {
-        usuario = UsuarioDao();
-        if(usuario == nome.usuario){
-            novoUsuario = usuario;
-        }
+        String username = usernameField.getText().toString();
+        String password = passwordField.getText().toString();
+
         AppDatabase db = AppDatabase.getDatabase(this);
         assert db != null;
         UsuarioDao usuarioDao = db.usuarioDao();
