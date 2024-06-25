@@ -2,8 +2,8 @@ package com.example.p2.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
-
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -16,16 +16,27 @@ import com.example.p2.R;
 import com.example.p2.database.AppDatabase;
 import com.example.p2.entities.Cidade;
 
+
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.model.FindAutocompletePredictionsResponse;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.Status;
+import java.util.List;
+
 public class NovaCidade extends AppCompatActivity {
-    private EditText nomeEditText;
-    private Spinner estadoSpinner;
-    private Button voltar, salvarButton;
-    private AppDatabase db;
+    private EditText nomeEditText, estadoEditText;
+    private Button voltarButton, salvarButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nova_cidade);
+
 
         nomeEditText = findViewById(R.id.desc);
         estadoSpinner = findViewById(R.id.estadoSpinner);
@@ -37,42 +48,91 @@ public class NovaCidade extends AppCompatActivity {
         estadoSpinner.setAdapter(adapter);
 
         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "AppDatabase")
-                .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
 
         salvarButton = findViewById(R.id.salvar);
-        salvarButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                salvarCidade();
-            }
-        });
+        salvarButton.setOnClickListener(view -> verificarECadastrarCidade());
 
-        voltar = findViewById(R.id.voltarnv);
-        voltar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(NovaCidade.this, GerenciarCidades.class);
-                startActivity(intent);
-            }
-        });
-    }
-
-    private void salvarCidade() {
-        String nome = nomeEditText.getText().toString();
-        String estado = estadoSpinner.getSelectedItem().toString();
-        if (nome != null && !nome.trim().isEmpty()) {
-            Cidade novaCidade = new Cidade();
-            novaCidade.setNomeCidade(nome);
-            novaCidade.setEstado(estado);
-
-            db.cidadeDao().insert(novaCidade);
-            Toast.makeText(NovaCidade.this, "Cidade salva com sucesso!", Toast.LENGTH_SHORT).show();
+        voltarButton = findViewById(R.id.voltarnv);
+        voltarButton.setOnClickListener(v -> {
             Intent intent = new Intent(NovaCidade.this, GerenciarCidades.class);
             startActivity(intent);
+        });
+
+
+    }
+
+    private void verificarECadastrarCidade() {
+        String nome = nomeEditText.getText().toString().trim();
+        String estado = estadoEditText.getText().toString().trim();
+
+        if (!nome.isEmpty() && !estado.isEmpty()) {
+            String cidadeNomeCompleto = nome + ", " + estado;
+            cidadeExiste(cidadeNomeCompleto);
         } else {
             Toast.makeText(this, "Nome e estado da cidade não podem ser vazios.", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void cidadeExiste(String nomeCidade) {
+        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+
+        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+                .setTypeFilter(FindAutocompletePredictionsRequest.TypeFilter.CITIES)
+                .setQuery(nomeCidade)
+                .setSessionToken(token)
+                .build();
+
+        placesClient.findAutocompletePredictions(request).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                FindAutocompletePredictionsResponse response = task.getResult();
+                List<AutocompletePrediction> predictions = response.getAutocompletePredictions();
+
+                boolean cidadeEncontrada = predictions.stream()
+                        .anyMatch(prediction -> prediction.getPrimaryText(null).toString().equalsIgnoreCase(nomeCidade));
+
+                if (cidadeEncontrada) {
+                    salvarCidade(nomeCidade);
+                } else {
+                    Toast.makeText(NovaCidade.this, "Cidade não encontrada", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(NovaCidade.this, "Erro ao verificar cidade: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(e -> {
+            if (e instanceof ApiException) {
+                ApiException apiException = (ApiException) e;
+                Status status = apiException.getStatus();
+                Toast.makeText(NovaCidade.this, "Erro ao verificar cidade: " + status.getStatusMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void salvarCidade(String nomeCidade) {
+        String[] partes = nomeCidade.split(", ");
+        if (partes.length == 2) {
+            String nome = partes[0];
+            String estado = partes[1];
+
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    Cidade novaCidade = new Cidade();
+                    novaCidade.setNomeCidade(nome);
+                    novaCidade.setEstado(estado);
+                    db.cidadeDao().insert(novaCidade);
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    Toast.makeText(NovaCidade.this, "Cidade salva com sucesso!", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(NovaCidade.this, GerenciarCidades.class));
+                }
+            }.execute();
+        }
+    }
 }
+
+
