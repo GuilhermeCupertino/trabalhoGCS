@@ -2,6 +2,7 @@ package com.example.p2.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -30,6 +31,7 @@ public class EditarConta extends AppCompatActivity {
     private TextView senha;
     private int usuarioId;
     private SharedPreferences sharedPreferences;
+    private UsuarioDao usuarioDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,100 +39,129 @@ public class EditarConta extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_editar_conta);
 
+        initViews();
+        initDatabase();
+        applyInsets();
+
+        voltar.setOnClickListener(v -> startActivity(new Intent(EditarConta.this, TelaInicial.class)));
+        salvar.setOnClickListener(v -> salvarConta());
+
+        preencherDadosUsuario();
+    }
+
+    private void initViews() {
         voltar = findViewById(R.id.btn_voltarTelaInicial);
         salvar = findViewById(R.id.btn_salvar);
         nome = findViewById(R.id.txt_editName);
         telefone = findViewById(R.id.txt_editPhone);
         email = findViewById(R.id.txt_editEmail);
         senha = findViewById(R.id.txt_editPassword);
+    }
 
+    private void initDatabase() {
+        usuarioDao = AppDatabase.getDatabase(this).usuarioDao();
+    }
 
+    private void applyInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        voltar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(EditarConta.this, TelaInicial.class));
-            }
-        });
-
-        salvar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                salvarConta();
-            }
-        });
-
-        // Preenche o TextView com os dados do usuário
-        preencherDadosUsuario();
     }
 
     private void preencherDadosUsuario() {
-        // Obtém o usuário do banco de dados pelo ID
         sharedPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
         usuarioId = sharedPreferences.getInt("usuarioId", -1);
-        UsuarioDao usuarioDao = AppDatabase.getDatabase(this).usuarioDao();
-        Usuario usuario = usuarioDao.getUser(usuarioId);
 
-        // Verifica se o usuário foi encontrado
-        if (usuario != null) {
-            // Preenche os TextViews com os dados do usuário
-            nome.setText(usuario.getNome());
-            telefone.setText(usuario.getTelefone());
-            email.setText(usuario.getEmail());
-            senha.setText(usuario.getSenha());
-        } else {
-            // Mostra uma mensagem de erro se o usuário não foi encontrado
-            Toast.makeText(this, "Erro: usuário não encontrado", Toast.LENGTH_SHORT).show();
-
-            // Volta para a tela de login
-            Intent intent = new Intent(EditarConta.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
+        new FetchUserTask().execute(usuarioId);
     }
 
     private void salvarConta() {
-        String novoNome = nome.getText().toString();
-        String novoTelefone = telefone.getText().toString();
-        String novoEmail = email.getText().toString();
-        String novaSenha = senha.getText().toString();
+        String novoNome = nome.getText().toString().trim();
+        String novoTelefone = telefone.getText().toString().trim();
+        String novoEmail = email.getText().toString().trim();
+        String novaSenha = senha.getText().toString().trim();
 
-        // Obtém o usuário do banco de dados pelo ID
-        UsuarioDao usuarioDao = AppDatabase.getDatabase(this).usuarioDao();
-        Usuario usuario = usuarioDao.getUser(usuarioId);
+        if (validarEntradas(novoNome, novoTelefone, novoEmail, novaSenha)) {
+            new UpdateUserTask(novoNome, novoTelefone, novoEmail, novaSenha).execute(usuarioId);
+        } else {
+            showToast("Por favor, preencha todos os campos corretamente.");
+        }
+    }
 
-        // Verifica se o usuário foi encontrado
-        if (usuario != null) {
-            // Verifica se houve alterações nos dados do usuário
-            if (!usuario.getNome().equals(novoNome) ||
-                    !usuario.getTelefone().equals(novoTelefone) ||
-                    !usuario.getEmail().equals(novoEmail) ||
+    private boolean validarEntradas(String nome, String telefone, String email, String senha) {
+        return !nome.isEmpty() && !telefone.isEmpty() && !email.isEmpty() && !senha.isEmpty();
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private class FetchUserTask extends AsyncTask<Integer, Void, Usuario> {
+        @Override
+        protected Usuario doInBackground(Integer... integers) {
+            int userId = integers[0];
+            return usuarioDao.getUser(userId);
+        }
+
+        @Override
+        protected void onPostExecute(Usuario usuario) {
+            if (usuario != null) {
+                nome.setText(usuario.getNome());
+                telefone.setText(usuario.getTelefone());
+                email.setText(usuario.getEmail());
+                senha.setText(usuario.getSenha());
+            } else {
+                showToast("Erro: usuário não encontrado");
+                startActivity(new Intent(EditarConta.this, MainActivity.class));
+                finish();
+            }
+        }
+    }
+
+    private class UpdateUserTask extends AsyncTask<Integer, Void, Boolean> {
+        private String novoNome, novoTelefone, novoEmail, novaSenha;
+
+        UpdateUserTask(String novoNome, String novoTelefone, String novoEmail, String novaSenha) {
+            this.novoNome = novoNome;
+            this.novoTelefone = novoTelefone;
+            this.novoEmail = novoEmail;
+            this.novaSenha = novaSenha;
+        }
+
+        @Override
+        protected Boolean doInBackground(Integer... integers) {
+            int userId = integers[0];
+            Usuario usuario = usuarioDao.getUser(userId);
+
+            if (usuario != null) {
+                if (!usuario.getNome().equals(novoNome) || 
+                    !usuario.getTelefone().equals(novoTelefone) || 
+                    !usuario.getEmail().equals(novoEmail) || 
                     !usuario.getSenha().equals(novaSenha)) {
+                    
+                    usuario.setNome(novoNome);
+                    usuario.setTelefone(novoTelefone);
+                    usuario.setEmail(novoEmail);
+                    usuario.setSenha(novaSenha);  // Note: You should hash the password before storing
 
-                // Atualiza os dados do usuário no banco de dados
-                usuario.setNome(novoNome);
-                usuario.setTelefone(novoTelefone);
-                usuario.setEmail(novoEmail);
-                usuario.setSenha(novaSenha);
-                usuarioDao.update(usuario);
+                    usuarioDao.update(usuario);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result) {
                 showToast("Dados atualizados com sucesso");
-
-                // Volta para a tela inicial
-                Intent intent = new Intent(EditarConta.this, TelaInicial.class);
-                startActivity(intent);
+                startActivity(new Intent(EditarConta.this, TelaInicial.class));
                 finish();
             } else {
                 showToast("Nenhuma alteração realizada");
             }
         }
-    }
-
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
