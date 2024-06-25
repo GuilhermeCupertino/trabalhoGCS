@@ -43,7 +43,7 @@ public class EdtEndereco extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edt_endereco);
 
-        voltar = findViewById(R.id.voltarnv);
+        voltarDetalhesEndereco = findViewById(R.id.voltarnv);
         excluir = findViewById(R.id.btn_excluirE);
         salvar = findViewById(R.id.btn_salvarE);
         cidades = findViewById(R.id.cidadesSpinner);
@@ -64,6 +64,8 @@ public class EdtEndereco extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+
 
         salvar.setOnClickListener(new View.OnClickListener() {
             @Override
