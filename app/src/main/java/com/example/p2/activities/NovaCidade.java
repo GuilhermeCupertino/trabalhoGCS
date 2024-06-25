@@ -6,13 +6,17 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.p2.R;
 import com.example.p2.database.AppDatabase;
 import com.example.p2.entities.Cidade;
+
+
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
 import com.google.android.libraries.places.api.model.AutocompletePrediction;
 import com.google.android.libraries.places.api.model.FindAutocompletePredictionsRequest;
@@ -26,20 +30,22 @@ import java.util.List;
 public class NovaCidade extends AppCompatActivity {
     private EditText nomeEditText, estadoEditText;
     private Button voltarButton, salvarButton;
-    private AppDatabase db;
-    private PlacesClient placesClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nova_cidade);
 
-        // Initialize Places
-        Places.initialize(getApplicationContext(), YOUR_API_KEY);
-        placesClient = Places.createClient(this);
 
         nomeEditText = findViewById(R.id.desc);
-        estadoEditText = findViewById(R.id.lat);
+        estadoSpinner = findViewById(R.id.estadoSpinner);
+
+        // Preenche o Spinner com os estados
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+            R.array.estados_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        estadoSpinner.setAdapter(adapter);
 
         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "AppDatabase")
                 .fallbackToDestructiveMigration()
@@ -53,6 +59,8 @@ public class NovaCidade extends AppCompatActivity {
             Intent intent = new Intent(NovaCidade.this, GerenciarCidades.class);
             startActivity(intent);
         });
+
+
     }
 
     private void verificarECadastrarCidade() {
@@ -126,4 +134,5 @@ public class NovaCidade extends AppCompatActivity {
         }
     }
 }
+
 
