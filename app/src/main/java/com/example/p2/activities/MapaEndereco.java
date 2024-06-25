@@ -25,7 +25,7 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
 
     private static final String TAG = "MapaEndereco";
 
-    private GoogleMap map;
+    private GoogleMap mapeamento ;
     private ActivityMapaEnderecoBinding binding;
     private double lati, longi;
     private String endMarcado;
@@ -87,12 +87,6 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    @Override
-    public void onMapReady(@NonNull GoogleMap map) {
-        googleMap = map;
-        LatLng city = new LatLng(-34, 151);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(city, 10));
-    }
 
     @Override
     protected void onResume() {
@@ -107,28 +101,11 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
-
-    @Override
-    protected void onPause() {
-        mapView.onPause();
-        super.onPause();
-    }
-
-    @Override
     protected void onDestroy() {
         mapView.onDestroy();
         super.onDestroy();
     }
 
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
