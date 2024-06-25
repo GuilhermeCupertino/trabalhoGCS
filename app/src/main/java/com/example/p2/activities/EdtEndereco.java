@@ -43,7 +43,7 @@ public class EdtEndereco extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edt_endereco);
 
-        voltar = findViewById(R.id.voltarnv);
+        voltarDetalhesEndereco = findViewById(R.id.voltarnv);
         excluir = findViewById(R.id.btn_excluirE);
         salvar = findViewById(R.id.btn_salvarE);
         cidades = findViewById(R.id.cidadesSpinner);
@@ -57,14 +57,17 @@ public class EdtEndereco extends AppCompatActivity {
                 .build();
         carregarCidades();
 
-        voltar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(EdtEndereco.this, GerenciarEndereco.class);
-                startActivity(intent);
-            }
-        });
-
+    // Configura um listener para o botão voltarDetalhesEndereco
+    voltarDetalhesEndereco.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            // Inicia uma nova atividade
+            // O novo Intent especifica que a atividade atual (GerenciarEndereco)
+            // irá iniciar a atividade TelaInicial
+            startActivity(new Intent(GerenciarEndereco.this, TelaInicial.class));
+        }
+    });
+}
         salvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
