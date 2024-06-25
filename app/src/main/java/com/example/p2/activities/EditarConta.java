@@ -1,3 +1,4 @@
+
 package com.example.p2.activities;
 
 import android.content.Intent;
@@ -23,12 +24,8 @@ import com.example.p2.entities.Usuario;
 
 public class EditarConta extends AppCompatActivity {
 
-    private Button voltar;
-    private Button salvar;
-    private TextView nome;
-    private TextView telefone;
-    private TextView email;
-    private TextView senha;
+    private Button voltar, salvar, deletar;
+    private TextView nome, telefone, email, senha;
     private int usuarioId;
     private SharedPreferences sharedPreferences;
     private UsuarioDao usuarioDao;
@@ -36,7 +33,6 @@ public class EditarConta extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_editar_conta);
 
         initViews();
@@ -52,71 +48,43 @@ public class EditarConta extends AppCompatActivity {
     private void initViews() {
         voltar = findViewById(R.id.btn_voltarTelaInicial);
         salvar = findViewById(R.id.btn_salvar);
+        deletar = findViewById(R.id.btn_deletar); // Referência ao botão de deletar
         nome = findViewById(R.id.txt_editName);
         telefone = findViewById(R.id.txt_editPhone);
         email = findViewById(R.id.txt_editEmail);
         senha = findViewById(R.id.txt_editPassword);
     }
 
-    private void initDatabase() {
-        usuarioDao = AppDatabase.getDatabase(this).usuarioDao();
+        voltar.setOnClickListener(v -> startActivity(new Intent(EditarConta.this, TelaInicial.class)));
+        salvar.setOnClickListener(v -> salvarConta());
+        deletar.setOnClickListener(v -> confirmarDelecao()); // Adiciona um ouvinte de cliques ao botão de deletar
+
+        preencherDadosUsuario();
     }
 
-    private void applyInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+    private void confirmarDelecao() {
+        new AlertDialog.Builder(this)
+            .setTitle("Confirmar Deleção")
+            .setMessage("Você tem certeza que deseja deletar sua conta? Esta ação é irreversível.")
+            .setPositiveButton("Deletar", (dialog, which) -> deletarConta())
+            .setNegativeButton("Cancelar", null)
+            .show();
     }
 
-    private void preencherDadosUsuario() {
-        sharedPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
-        usuarioId = sharedPreferences.getInt("usuarioId", -1);
+    private void deletarConta() {
+        UsuarioDao usuarioDao = AppDatabase.getDatabase(this).usuarioDao();
+        Usuario usuario = usuarioDao.getUser(usuarioId);
+        if (usuario != null) {
+            usuarioDao.delete(usuario);
+            showToast("Conta deletada com sucesso.");
 
-        new FetchUserTask().execute(usuarioId);
-    }
-
-    private void salvarConta() {
-        String novoNome = nome.getText().toString().trim();
-        String novoTelefone = telefone.getText().toString().trim();
-        String novoEmail = email.getText().toString().trim();
-        String novaSenha = senha.getText().toString().trim();
-
-        if (validarEntradas(novoNome, novoTelefone, novoEmail, novaSenha)) {
-            new UpdateUserTask(novoNome, novoTelefone, novoEmail, novaSenha).execute(usuarioId);
+            // Volta para a tela de login
+            Intent intent = new Intent(EditarConta.this, MainActivity.class);
+            startActivity(intent);
+            finish();
         } else {
-            showToast("Por favor, preencha todos os campos corretamente.");
-        }
-    }
+            showToast("Erro: usuário não encontrado");
 
-    private boolean validarEntradas(String nome, String telefone, String email, String senha) {
-        return !nome.isEmpty() && !telefone.isEmpty() && !email.isEmpty() && !senha.isEmpty();
-    }
-
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    private class FetchUserTask extends AsyncTask<Integer, Void, Usuario> {
-        @Override
-        protected Usuario doInBackground(Integer... integers) {
-            int userId = integers[0];
-            return usuarioDao.getUser(userId);
-        }
-
-        @Override
-        protected void onPostExecute(Usuario usuario) {
-            if (usuario != null) {
-                nome.setText(usuario.getNome());
-                telefone.setText(usuario.getTelefone());
-                email.setText(usuario.getEmail());
-                senha.setText(usuario.getSenha());
-            } else {
-                showToast("Erro: usuário não encontrado");
-                startActivity(new Intent(EditarConta.this, MainActivity.class));
-                finish();
-            }
         }
     }
 
