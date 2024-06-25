@@ -52,16 +52,31 @@ public class NovaCidade extends AppCompatActivity {
     }
 
     private void salvarCidade() {
-        String nome = nomeEditText.getText().toString();
-        String estado = estadoEditText.getText().toString();
+    String nome = nomeEditText.getText().toString();
+    String estado = estadoEditText.getText().toString();
+    if(nome != null && !nome.trim().isEmpty() && estado != null && !estado.trim().isEmpty()) {
+        CidadeValidator cidadeValidator = new CidadeValidator(this);
+        cidadeValidator.validarCidade(nome + ", " + estado, new CidadeValidator.CidadeValidationListener() {
+            @Override
+            public void onValidationResult(boolean isValid) {
+                if (isValid) {
+                    Cidade novaCidade = new Cidade();
+                    novaCidade.setNomeCidade(nome);
+                    novaCidade.setEstado(estado);
 
-        Cidade novaCidade = new Cidade();
-        novaCidade.setNomeCidade(nome);
-        novaCidade.setEstado(estado);
-
-        db.cidadeDao().insert(novaCidade);
-        Toast.makeText(this, "Cidade salva com sucesso!", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(NovaCidade.this, GerenciarCidades.class);
-        startActivity(intent);
+                    db.cidadeDao().insert(novaCidade);
+                    Toast.makeText(NovaCidade.this, "Cidade salva com sucesso!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(NovaCidade.this, GerenciarCidades.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(NovaCidade.this, "Cidade não encontrada. Por favor, verifique os dados.", Toast.LENGTH_SHORT).show();
+                    logger.error("Tentativa de salvar cidade não existente: nome='{}', estado='{}'", nome, estado);
+                }
+            }
+        });
+    } else {
+        Toast.makeText(this, "Nome e estado da cidade não podem ser vazios.", Toast.LENGTH_SHORT).show();
+        logger.error("Tentativa de salvar cidade com dados faltantes: nome='{}', estado='{}'", nome, estado);
     }
+  }
 }
