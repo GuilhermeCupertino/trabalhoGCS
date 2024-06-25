@@ -103,6 +103,7 @@ public class TelaInicial extends AppCompatActivity {
             Usuario usuario = usuarioDao.getUser(usuarioId);
 
             if (usuario != null) {
+                print("mudança para realizar o commit");
                 String nomeUsuario = usuario.getNome();
                 bemVindo.setText(getString(R.string.bemVindo) + " " + nomeUsuario);
             }
