@@ -50,17 +50,17 @@ public class VisualizarUsuarios extends AppCompatActivity {
 
         // Recuperar a lista de usuários do banco de dados
         UsuarioDao usuarioDao = db.usuarioDao();
-        List<Usuario> usuarios = usuarioDao.getAll();
+        List<Usuario> usuario = usuario.getAll();
 
         // Configurar o adaptador personalizado
         adapter = new UsuarioAdapter(this, usuarios);
         listViewUsuarios.setAdapter(adapter);
 
-        voltar.setOnClickListener(new View.OnClickListener() {
+        volta.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                print("mudança para commit no trabalho");
                 startActivity(new Intent(VisualizarUsuarios.this, TelaInicial.class));
+
             }
         });
     }

@@ -38,7 +38,7 @@ public class TelaInicial extends AppCompatActivity {
         gerenciarCidades = findViewById(R.id.btn_gerenciarC);
         gerenciarEnderecos = findViewById(R.id.btn_gerenciarE);
         profile = findViewById(R.id.btn_profile);
-        bemVindo = findViewById(R.id.txt_bemVindo);
+        bemVindo = findViewById(R.id.txt_bvindo);
         sair = findViewById(R.id.btn_sair);
         visualizarUsuarios = findViewById(R.id.btn_visualizarU);
 
@@ -99,13 +99,12 @@ public class TelaInicial extends AppCompatActivity {
             // Obtém o nome do usuário logado no banco de dados
             AppDatabase db = AppDatabase.getDatabase(this);
             assert db != null;
-            UsuarioDao usuarioDao = db.usuarioDao();
             Usuario usuario = usuarioDao.getUser(usuarioId);
 
             if (usuario != null) {
-                print("mudança para realizar o commit");
                 String nomeUsuario = usuario.getNome();
                 bemVindo.setText(getString(R.string.bemVindo) + " " + nomeUsuario);
+
             }
         }
     }
