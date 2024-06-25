@@ -1,15 +1,51 @@
+
+package com.example.p2.activities;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.room.Room;
+
+import com.example.p2.R;
+import com.example.p2.dao.UsuarioDao;
+import com.example.p2.database.AppDatabase;
+import com.example.p2.entities.Usuario;
+
 public class EditarConta extends AppCompatActivity {
 
     private Button voltar, salvar, deletar;
     private TextView nome, telefone, email, senha;
     private int usuarioId;
     private SharedPreferences sharedPreferences;
+    private UsuarioDao usuarioDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editar_conta);
 
+        initViews();
+        initDatabase();
+        applyInsets();
+
+        voltar.setOnClickListener(v -> startActivity(new Intent(EditarConta.this, TelaInicial.class)));
+        salvar.setOnClickListener(v -> salvarConta());
+
+        preencherDadosUsuario();
+    }
+
+    private void initViews() {
         voltar = findViewById(R.id.btn_voltarTelaInicial);
         salvar = findViewById(R.id.btn_salvar);
         deletar = findViewById(R.id.btn_deletar); // Referência ao botão de deletar
@@ -17,6 +53,7 @@ public class EditarConta extends AppCompatActivity {
         telefone = findViewById(R.id.txt_editPhone);
         email = findViewById(R.id.txt_editEmail);
         senha = findViewById(R.id.txt_editPassword);
+    }
 
         voltar.setOnClickListener(v -> startActivity(new Intent(EditarConta.this, TelaInicial.class)));
         salvar.setOnClickListener(v -> salvarConta());
@@ -47,46 +84,52 @@ public class EditarConta extends AppCompatActivity {
             finish();
         } else {
             showToast("Erro: usuário não encontrado");
+
         }
     }
 
-    private void salvarConta() {
-        String novoNome = nome.getText().toString();
-        String novoTelefone = telefone.getText().toString();
-        String novoEmail = email.getText().toString();
-        String novaSenha = senha.getText().toString();
+    private class UpdateUserTask extends AsyncTask<Integer, Void, Boolean> {
+        private String novoNome, novoTelefone, novoEmail, novaSenha;
 
-        // Obtém o usuário do banco de dados pelo ID
-        UsuarioDao usuarioDao = AppDatabase.getDatabase(this).usuarioDao();
-        Usuario usuario = usuarioDao.getUser(usuarioId);
+        UpdateUserTask(String novoNome, String novoTelefone, String novoEmail, String novaSenha) {
+            this.novoNome = novoNome;
+            this.novoTelefone = novoTelefone;
+            this.novoEmail = novoEmail;
+            this.novaSenha = novaSenha;
+        }
 
-        // Verifica se o usuário foi encontrado
-        if (usuario != null) {
-            // Verifica se houve alterações nos dados do usuário
-            if (!usuario.getNome().equals(novoNome) ||
-                    !usuario.getTelefone().equals(novoTelefone) ||
-                    !usuario.getEmail().equals(novoEmail) ||
+        @Override
+        protected Boolean doInBackground(Integer... integers) {
+            int userId = integers[0];
+            Usuario usuario = usuarioDao.getUser(userId);
+
+            if (usuario != null) {
+                if (!usuario.getNome().equals(novoNome) || 
+                    !usuario.getTelefone().equals(novoTelefone) || 
+                    !usuario.getEmail().equals(novoEmail) || 
                     !usuario.getSenha().equals(novaSenha)) {
+                    
+                    usuario.setNome(novoNome);
+                    usuario.setTelefone(novoTelefone);
+                    usuario.setEmail(novoEmail);
+                    usuario.setSenha(novaSenha);  // Note: You should hash the password before storing
 
-                // Atualiza os dados do usuário no banco de dados
-                usuario.setNome(novoNome);
-                usuario.setTelefone(novoTelefone);
-                usuario.setEmail(novoEmail);
-                usuario.setSenha(novaSenha);
-                usuarioDao.update(usuario);
+                    usuarioDao.update(usuario);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result) {
                 showToast("Dados atualizados com sucesso");
-
-                // Volta para a tela inicial
-                Intent intent = new Intent(EditarConta.this, TelaInicial.class);
-                startActivity(intent);
+                startActivity(new Intent(EditarConta.this, TelaInicial.class));
                 finish();
             } else {
                 showToast("Nenhuma alteração realizada");
             }
         }
-    }
-
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
