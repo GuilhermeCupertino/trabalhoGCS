@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/back"
-    tools:context=".activities.MainActivity">
+    tools:context=".LoginActivity">
 
     <!-- Título do Aplicativo -->
     <TextView
@@ -102,5 +101,6 @@
         app:layout_constraintBottom_toTopOf="@+id/btn_cadastrarLogin"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
