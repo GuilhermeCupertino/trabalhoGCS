@@ -75,6 +75,7 @@ public class NovaCidade extends AppCompatActivity {
         }
     }
 
+
     private void cidadeExiste(String nomeCidade) {
         AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
 
