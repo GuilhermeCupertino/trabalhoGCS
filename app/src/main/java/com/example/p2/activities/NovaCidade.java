@@ -63,6 +63,8 @@ public class NovaCidade extends AppCompatActivity {
 
     }
 
+
+
         // Método para verificar se a cidade existe utilizando a API do Google Places
     private void cidadeExiste(String nomeCidade) {
         AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
