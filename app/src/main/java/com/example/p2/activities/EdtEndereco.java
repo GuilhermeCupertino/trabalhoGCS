@@ -43,7 +43,7 @@ public class EdtEndereco extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edt_endereco);
 
-        voltar = findViewById(R.id.voltarnv);
+        voltarDetalhesEndereco = findViewById(R.id.voltarnv);
         excluir = findViewById(R.id.btn_excluirE);
         salvar = findViewById(R.id.btn_salvarE);
         cidades = findViewById(R.id.cidadesSpinner);
@@ -60,10 +60,12 @@ public class EdtEndereco extends AppCompatActivity {
         voltar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(EdtEndereco.this, GerenciarEndereco.class);
+                Intent intent = new Intent(EdtEndereco.this, NovoEndereco.class);
                 startActivity(intent);
             }
         });
+
+
 
         salvar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,6 +93,7 @@ public class EdtEndereco extends AppCompatActivity {
         cidadesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cidades.setAdapter(cidadesAdapter);
     }
+
 
     private void salvarAlteracoes() {
         // Obtém o DAO do endereço do banco de dados

@@ -38,7 +38,7 @@ public class GerenciarEndereco extends AppCompatActivity {
         setContentView(R.layout.activity_gerenciar_endereco);
 
         listViewEnd = findViewById(R.id.lista_end);
-        voltar = findViewById(R.id.voltarCidade);
+        voltarDetalhesEndereco = findViewById(R.id.voltarCidade);
         novoEnd = findViewById(R.id.novoend);
         buscar = findViewById(R.id.botaoBuscar_end);
         buscarEnd = findViewById(R.id.buscarEnd);
@@ -61,12 +61,17 @@ public class GerenciarEndereco extends AppCompatActivity {
         enderecoAdapter = new EnderecoAdapter(this, enderecos);
         listViewEnd.setAdapter(enderecoAdapter);
 
-        voltar.setOnClickListener(new View.OnClickListener() {
+        // Configura um listener para o botão voltarDetalhesEndereco
+        voltarDetalhesEndereco.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Inicia uma nova atividade
+                // O novo Intent especifica que a atividade atual (GerenciarEndereco)
+                // irá iniciar a atividade TelaInicial
                 startActivity(new Intent(GerenciarEndereco.this, TelaInicial.class));
             }
         });
+    }
 
         novoEnd.setOnClickListener(new View.OnClickListener() {
             @Override
