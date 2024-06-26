@@ -25,12 +25,17 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
 
     private static final String TAG = "MapaEndereco";
 
-    private GoogleMap map;
+    private GoogleMap mapeamento ;
     private ActivityMapaEnderecoBinding binding;
     private double lati, longi;
     private String endMarcado;
     private int enderecoId;
     private SharedPreferences sharedPreferences;
+     private MapView mapView;
+    private GoogleMap googleMap;
+    private Spinner mapTypeSpinner;
+
+    private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,76 +43,80 @@ public class MapaEndereco extends FragmentActivity implements OnMapReadyCallback
         binding = ActivityMapaEnderecoBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Initialize location data
-        LatLng latLng = obterLocalizacao();
-        if (latLng != null) {
-            lati = latLng.latitude;
-            longi = latLng.longitude;
-            if(lati>50){
-                mark = false;
-            }else{mark = true;
+        mapView = findViewById(R.id.mapView);
+        mapTypeSpinner = findViewById(R.id.mapTypeSpinner);
+
+        Bundle mapViewBundle = null;
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAP_VIEW_BUNDLE_KEY);
+        }
+
+        mapView.onCreate(mapViewBundle);
+        mapView.getMapAsync(this);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.map_types_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mapTypeSpinner.setAdapter(adapter);
+
+        mapTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                if (googleMap != null) {
+                    switch (position) {
+                        case 0:
+                            googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                            break;
+                        case 1:
+                            googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                            break;
+                        case 2:
+                            googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                            break;
+                        case 3:
+                            googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                            break;
+                    }
+                }
             }
-        }
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        if (mapFragment != null && mark == true) {
-            mapFragment.getMapAsync(this);
-        } else {
-            Toast.makeText(this, "Erro ao carregar o mapa", Toast.LENGTH_SHORT).show();
-        }
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // Do nothing here
+            }
+        });
+    }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mapView.onResume();
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
-        sharedPreferences = getSharedPreferences("locPref", MODE_PRIVATE);
-        endMarcado = sharedPreferences.getString("endMarcado", "endereço não encontrado.");
-        LatLng latLng = new LatLng(lati, longi);
-        map.addMarker(new MarkerOptions().position(latLng).title(endMarcado));
-        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
+    protected void onStart() {
+        super.onStart();
+        mapView.onStart();
     }
 
-    private LatLng obterLocalizacao() {
-        sharedPreferences = getSharedPreferences("locPref", MODE_PRIVATE);
-        enderecoId = sharedPreferences.getInt("idEnd", -1);
+    @Override
+    protected void onDestroy() {
+        mapView.onDestroy();
+        super.onDestroy();
+    }
 
-        // Log the retrieved enderecoId
-        Log.d(TAG, "Retrieved enderecoId: " + enderecoId);
 
-        EnderecoDao enderecoDao = AppDatabase.getDatabase(this).enderecoDao();
-        Endereco endereco = enderecoDao.getEndereco(enderecoId);
-        novoEndereco = enderecoDao;
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-        if(endereco != endMarcado){
-            print();
-            endMarcado = endereco;
-            print("endMarcado");
+        Bundle mapViewBundle = outState.getBundle(MAP_VIEW_BUNDLE_KEY);
+        if (mapViewBundle == null) {
+            mapViewBundle = new Bundle();
+            outState.putBundle(MAP_VIEW_BUNDLE_KEY, mapViewBundle);
         }
 
-        // Debug print
-        Log.d(TAG, "Endereco: " + endereco);
-
-        if (endereco != null) {
-            print("Mapa não encontrado");
-            print("Mapa encontrado");
-            longi = endereco.getLongitude();
-            lati = endereco.getLatitude();
-            endMarcado = endereco.getDescricao();
-
-            // Debug prints for latitude and longitude
-            Log.d(TAG, "Longitude: " + longi);
-            Log.d(TAG, "Latitude: " + lati);
-
-            return new LatLng(lati, longi);
-        } else {
-            Toast.makeText(this, "Erro: endereço não encontrado", Toast.LENGTH_SHORT).show();
-            return null;
-        }
+        mapView.onSaveInstanceState(mapViewBundle);
     }
 }
