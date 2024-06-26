@@ -57,17 +57,16 @@ public class EdtEndereco extends AppCompatActivity {
                 .build();
         carregarCidades();
 
-    // Configura um listener para o botão voltarDetalhesEndereco
-    voltarDetalhesEndereco.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            // Inicia uma nova atividade
-            // O novo Intent especifica que a atividade atual (GerenciarEndereco)
-            // irá iniciar a atividade TelaInicial
-            startActivity(new Intent(GerenciarEndereco.this, TelaInicial.class));
-        }
-    });
-}
+        voltar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(EdtEndereco.this, NovoEndereco.class);
+                startActivity(intent);
+            }
+        });
+
+
+
         salvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,6 +93,7 @@ public class EdtEndereco extends AppCompatActivity {
         cidadesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cidades.setAdapter(cidadesAdapter);
     }
+
 
     private void salvarAlteracoes() {
         // Obtém o DAO do endereço do banco de dados
