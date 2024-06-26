@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
@@ -43,13 +44,16 @@ public class GerenciarCidades extends AppCompatActivity {
         buscar = findViewById(R.id.botaoBuscar_cid);
         buscarCid = findViewById(R.id.buscarCid);
 
+        // Inicializa o banco de dados Room
         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "AppDatabase")
-                .allowMainThreadQueries()
-                .fallbackToDestructiveMigration()
+                .allowMainThreadQueries() // Permite consultas na main thread (só para fins de exemplo, não é recomendado para produção)
+                .fallbackToDestructiveMigration() // Recria o banco de dados se necessário
                 .build();
 
+        // Carrega todas as cidades do banco de dados
         cidades = db.cidadeDao().getAll();
 
+        // Ordena as cidades por nome
         Collections.sort(cidades, new Comparator<Cidade>() {
             @Override
             public int compare(Cidade cidade1, Cidade cidade2) {
@@ -57,9 +61,11 @@ public class GerenciarCidades extends AppCompatActivity {
             }
         });
 
+        // Cria e configura o adapter para a ListView
         cidadeAdapter = new CidadeAdapter(this, cidades);
         listViewCidades.setAdapter(cidadeAdapter);
 
+        // Configuração do botão "Voltar"
         voltar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,6 +73,7 @@ public class GerenciarCidades extends AppCompatActivity {
             }
         });
 
+        // Configuração do botão "Nova Cidade"
         novaCidade.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,6 +81,7 @@ public class GerenciarCidades extends AppCompatActivity {
             }
         });
 
+        // Configuração do botão "Buscar"
         buscar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,23 +91,28 @@ public class GerenciarCidades extends AppCompatActivity {
 
     }
 
+    // Método para buscar cidades com base no texto de busca
     private void buscarCidades() {
         String textoBusca = buscarCid.getText().toString().trim();
         List<Cidade> cidadesFiltradas = new ArrayList<>();
 
+        // Filtra as cidades com base no texto de busca (considerando ignorar acentos)
         for (Cidade cidade : cidades) {
             if (removerAcentos(cidade.getNomeCidade().toLowerCase()).contains(removerAcentos(textoBusca.toLowerCase()))) {
                 cidadesFiltradas.add(cidade);
             }
         }
 
+        // Atualiza o adapter com as cidades filtradas
         cidadeAdapter = new CidadeAdapter(this, cidadesFiltradas);
         listViewCidades.setAdapter(cidadeAdapter);
     }
 
+    // Método para remover acentos de uma string
     private String removerAcentos(String str) {
         String nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD);
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(nfdNormalizedString).replaceAll("");
     }
+    
 }
